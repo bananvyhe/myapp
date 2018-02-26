@@ -3,21 +3,16 @@
   <head>
     <title>Myapp</title>
     <%= csrf_meta_tags %>
-               <%= javascript_pack_tag 'turbolinks' %>
+   <!--  <%= javascript_pack_tag 'axios' %>  -->
+		
+   <!-- 	<%= javascript_pack_tag 'turbolinks' %> -->
     <%= javascript_include_tag 'application' , 'data-turbolinks-track': 'reload' %>
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-
-        <%= javascript_pack_tag 'axios' %> 
-
-
-    <%= javascript_pack_tag 'application' %> 
-  
-    
-
-  </head>
-
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+		
+	</head>
   <body>
     <%= yield %>
+<!--     <%= javascript_pack_tag 'application' %>  -->
     <%= javascript_pack_tag 'hello_vue' %>
   </body>
 </html>

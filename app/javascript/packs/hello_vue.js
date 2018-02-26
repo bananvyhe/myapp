@@ -5,34 +5,103 @@
 // like app/views/layouts/application.html.erb.
 // All it does is render <div>Hello Vue</div> at the bottom of the page.   
 
-//import TurbolinksAdapter from 'vue-turbolinks';
-import axios from 'packs/axios.min.js'
+  
+
 import Vue from 'vue/dist/vue.esm'
+import TurbolinksAdapter from 'vue-turbolinks' 
+import axios from 'packs/axios.min.js'
  
-import Telpanel from '../telpanel.vue' 
-
-//Vue.use(TurbolinksAdapter);
+Vue.use(TurbolinksAdapter)
+ 
+	
+ 
 document.addEventListener('turbolinks:load', () => {
-	 
- let token = document.getElementsByName('csrf-token')[0].getAttribute('content')
-  axios.defaults.headers.common['X-CSRF-Token'] = token
-  axios.defaults.headers.common['Accept'] = 'application/json'  
- console.log('123wwwssdf')
+	let token = document.getElementsByName('csrf-token')[0].getAttribute('content')
+	axios.defaults.headers.common['X-CSRF-Token'] = token
+	axios.defaults.headers.common['Accept'] = 'application/json'  
+ 	console.log('123wwwssdf')
  
- var element = document.getElementById("team-form")
- 	console.log(element);
-  if (element != null) { 
-    const app = new Vue({
-      el: element,
+	var element = document.getElementById("team-form")
+	console.log('element id in hello vue existed');
+	if (element != null) { 
+		var id = element.dataset.id
+		var team = JSON.parse(element.dataset.team)
 
-      
-      
-      components: { Telpanel },
-   	 	data: function() {
-        return {   }
-      } 
-    }) 
-  }
+		var players_attributes = JSON.parse(element.dataset.playersAttributes)
+		players_attributes.forEach(function(player) { player._destroy = null })
+		team.players_attributes = players_attributes 
+	  var app = new Vue({
+	    el: element,
+	 		data: function () {
+	    	return {
+		      id: id, 
+		      team: team 
+	    	}
+	  	},
+		  created() {
+		  	axios.get('/teams')
+			  .then(function (response) {
+			    console.log(response);
+			  })
+			  .catch(function (error) {
+			    console.log(error);
+			  });	
+		  },
+		  mounted() {
+		 
+		  },
+		  updated() {
+		     
+		  },
+	 		methods: {
+		    addPlayer: function() {
+		      this.team.players_attributes.push({
+		        id: null,
+		        name: "",
+		        //position: "",
+		        _destroy: null
+		      })
+		      console.log(this.team.players_attributes)
+		      console.log(this.team)
+		    },
+		    removePlayer: function(index) {
+		      var player = this.team.players_attributes[index]
+		      if (player.id == null) {
+		        this.team.players_attributes.splice(index, 1)
+		      } else {
+		        this.team.players_attributes[index]._destroy = "1"
+		      }
+		      console.log(this.team.players_attributes)
+		      console.log(this.team)
+		    },
+		    undoRemove: function(index) {
+		      this.team.players_attributes[index]._destroy = null
+		    },
+		    saveTeam: function() {
+		      // Create a new team
+		      if (this.id == null) {
+		        axios.post('/teams', { team: this.team }).then(response => {
+		        Turbolinks.visit('/teams' ) 
+		        }, response => {
+		          console.log(response)
+		        })
+		      // Edit an existing team
+		      } else {
+		        axios.put(`/teams/${this.id}`, { team: this.team }).then(response => {
+		           Turbolinks.visit('/teams')
+		        }, response => {
+		          console.log(response)
+		        })
+		      }
+		    },
+		    existingTeam: function() {
+		      return this.team.id != null
+		    } 
+	      
+	    } 
+ 
+	  }) 
+	}
 })
 
 
